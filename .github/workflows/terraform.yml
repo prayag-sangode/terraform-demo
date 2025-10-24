@@ -2,6 +2,15 @@ name: Terraform Deploy
 
 on:
   workflow_dispatch:
+    inputs:
+      action:
+        description: 'Choose action: apply or destroy'
+        required: true
+        default: 'apply'
+        type: choice
+        options:
+          - apply
+          - destroy
 
 jobs:
   terraform:
@@ -19,8 +28,23 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
+      - name: Terraform Validate
+        run: terraform validate
+
       - name: Terraform Plan
         run: terraform plan
 
+      - name: Manual Approval for Apply/Destroy
+        if: ${{ github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy' }}
+        uses: hmarr/auto-approve-action@v2
+        with:
+          approve: false
+          comment: "Please approve to continue with Terraform action"
+
       - name: Terraform Apply
+        if: ${{ github.event.inputs.action == 'apply' }}
         run: terraform apply -auto-approve
+
+      - name: Terraform Destroy
+        if: ${{ github.event.inputs.action == 'destroy' }}
+        run: terraform destroy -auto-approve
